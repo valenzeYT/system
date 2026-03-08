@@ -150,6 +150,18 @@ std::string machine_guid() {
                            "MachineGuid");
 }
 
+bool run_cmd(std::string cmd) {
+    const char *real_cmd = cmd.c_str();
+    int success = system(real_cmd);
+    if (success == 0)
+    {
+        return true;
+    }
+    else
+    {
+        return false;
+    }
+}
 } // namespace system_lib
 
 extern "C" __declspec(dllexport)
@@ -210,6 +222,10 @@ void register_module() {
                     interp.registerModuleFunction("system", "machine_guid", [&interp](const std::vector<Value>& args) -> Value {
                         interp.expectArity(args, 0, "system.machine_guid");
                         return Value::fromString(system_lib::machine_guid());
+                    });
+                    interp.registerModuleFunction("system", "run_cmd", [&interp](const std::vector<Value>& args) -> Value {
+                        interp.expectArity(args, 1, "system.run_cmd");
+                        return Value::fromBool(system_lib::run_cmd(interp.expectString(args[0], "system.run_cmd expects string")));
                     });
 
     });
